@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Einkaufszettel</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="/client/index.css" />
+        <link rel="manifest" href="/client/manifest.json" />
+        <script defer src="/client/index.js"></script>
+    </head>
+    <body>
+        <div id="server-error-message" style="display: none;"><div>Verbindung fehlgeschlagen</div></div>
+        <div id="center">
+            <div id="list_selector">
+            </div>
+
+            <div id="list_container">
+                <div id="list-name"></div>
+                <input type="text" id="searchbar" placeholder="Suchen" />
+                <div class="list" id="list_todo"></div>
+                <div style="display: flex; flex-direction: row-reverse;">
+                    <a href="javascript:void(0)" id="button_add">Hinzufügen</a>
+                </div>
+                <div class="horizontal-separator"></div>
+                Eingekauft:
+                <div class="list" id="list_done"></div>
+            </div>
+        </div>
+
+        <template id="template-todo-item">
+            <link rel="stylesheet" href="/client/todo-item.css" />
+            <div id="root-element">
+                <div id="display-amount"></div>
+                <div id="display-name"></div>
+            </div>
+            <dialog id="dialog">
+                <form method="dialog">
+                    <div style="display: flex; flex-direction: column;">
+                        <label>
+                            Singular:
+                            <input type="text" id="input-singular" />
+                        </label>
+                        <label>
+                            Plural:
+                            <input type="text" id="input-plural" />
+                        </label>
+                        <label>
+                            Anzahl:
+                            <input type="number" id="input-amount" />
+                        </label>
+                        <label>
+                            Kategorie:
+                            <input type="text" id="input-category" />
+                        </label>
+                        <div>
+                            <button type="submit">Ok</button>
+                            <button type="button" id="button-delete">Löschen</button>
+                            <button type="button" id="button-cancel">Abbrechen</button>
+                        </div>
+                    </div>
+                </form>
+            </dialog>
+        </template>
+
+        <template id="template-todo-item-group">
+            <slot name="name" style="font-weight: bold;">NAME PLACEHOLDER</slot>
+            <slot name="content">CONTENT PLACEHOLDER</div>
+        </template>
+    </body>
+</html>

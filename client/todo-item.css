@@ -1,0 +1,39 @@
+#root-element {
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    padding: 4px;
+    margin: 2px 0;
+    user-select: none;
+    touch-action: pan-y;
+}
+
+#display-amount {
+    width: 3ch;
+    text-align: right;
+}
+
+#display-name {
+    height: 1lh;
+    flex-grow: 1;
+    cursor: pointer;
+}
+
+#display-name:empty:not(:focus):before {
+    content: "Leer (Rechtsklick / gedrückt halten zum bearbeiten)";
+    text-align: right;
+    display: block;
+}
+
+@media (pointer:coarse) {
+    #display-name:empty:not(:focus):before {
+        content: "Leer (gedrückt halten zum bearbeiten)";
+    }
+}
+
+@media (pointer:fine) {
+    #display-name:empty:not(:focus):before {
+        content: "Leer (Rechtsklick zum bearbeiten)";
+    }
+}

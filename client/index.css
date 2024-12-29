@@ -1,0 +1,66 @@
+:root {
+    --max-page-width: 500px;
+}
+
+body {
+    font-family: Noto Sans, Roboto, sans-serif;
+}
+
+#server-error-message {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    position: fixed;
+    width: 100%;
+    left: 0;
+    right: 0;
+
+    > div {
+        padding: 5px;
+        box-sizing: border-box;
+        background-color: crimson;
+        color: white;
+        font-weight: bold;
+        width: 100%;
+        max-width: var(--max-page-width);
+    }
+}
+
+#center {
+    margin: 0 auto;
+    max-width: var(--max-page-width);
+}
+
+.list-select-item {
+    color: black;
+    display: block;
+}
+
+#list-name {
+    font-weight: bold;
+}
+
+#searchbar {
+    width: calc(100% - 2 * 5px);
+    outline: 0;
+    border-width: 0 0 2px;
+    padding: 5px;
+    margin: 5px;
+    box-sizing: border-box;
+}
+
+.list > :not(:last-child)::after {
+    content: "";
+    display: block;
+    width: 90%;
+    height: 1px;
+    background-color: #dddddd;
+    margin: 0 auto;
+}
+
+.horizontal-separator {
+    width: 100%;
+    height: 2px;
+    background-color: #aaaaaa;
+    margin: 0 auto;
+}
