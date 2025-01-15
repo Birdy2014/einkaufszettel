@@ -39,7 +39,7 @@ class TodoItem extends HTMLElement {
         this.form.addEventListener("submit", _ => {
             for (const attribute_name of this.editable_attributes) {
                 const element = this.root.getElementById(`input-${attribute_name}`)
-                this.setAttribute(attribute_name, element.value)
+                this.setAttribute(attribute_name, element.value.trim())
             }
 
             this.send_update_request()
