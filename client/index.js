@@ -180,7 +180,9 @@ function refresh_list_display() {
     const items = shopping_list.items
         .entries()
         .filter(([_id, item]) => !item.deleted)
-        .filter(([_id, item]) => filter_re.test(item.amount === 1 ? item.singular || item.plural : item.plural || item.singular))
+        .filter(([_id, item]) =>
+            filter_re.test(item.amount === 1 ? item.singular || item.plural : item.plural || item.singular)
+            || filter_re.test(item.category))
         .toArray()
 
     const category_group_slots = items
