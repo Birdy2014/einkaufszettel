@@ -34,6 +34,8 @@ body {
 .list-select-item {
     color: black;
     display: block;
+    padding: 4px;
+    margin: 2px 0;
 }
 
 #list-name {
