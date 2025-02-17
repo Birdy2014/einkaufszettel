@@ -240,6 +240,8 @@ async function reload_list_from_server() {
     const error_message_element = document.getElementById("server-error-message")
     const error_message_timeout = setTimeout(_ => error_message_element.style.display = "none", 500)
 
+    const start_time = Date.now()
+
     let response
     try {
         response = await fetch(`/api/list?id=${shopping_list_id}&generation=${shopping_list.generation}`, {
@@ -248,8 +250,14 @@ async function reload_list_from_server() {
             cache: "no-cache",
         })
     } catch(error) {
+        const time_to_fail = Date.now() - start_time
+
         if (error instanceof DOMException && error.name == "TimeoutError") {
-            return
+            if (time_to_fail > long_polling_timeout / 2) {
+                return
+            }
+
+            console.log(`long polling failed with timeout after ${time_to_fail}ms`)
         }
 
         console.log(error)
@@ -262,7 +270,8 @@ async function reload_list_from_server() {
 
     if (!response.ok) {
         console.log("not ok")
-        error_message_element.style.display = "block"
+        clearTimeout(error_message_timeout)
+        error_message_element.style.removeProperty("display")
 
         await new Promise(resolve => setTimeout(resolve, error_wait_time))
         return
