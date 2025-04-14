@@ -38,9 +38,34 @@ body {
     margin: 2px 0;
 }
 
+.list-select-item:empty:before {
+    content: "Leer (Klicken zum bearbeiten)";
+    text-align: right;
+    display: block;
+}
+
 #list-name {
     font-weight: bold;
+    height: 1lh;
     cursor: default;
+}
+
+#list-name:empty:not(:focus):before {
+    content: "Leer (Rechtsklick / gedrückt halten zum bearbeiten)";
+    text-align: right;
+    display: block;
+}
+
+@media (pointer:coarse) {
+    #list-name:empty:not(:focus):before {
+        content: "Leer (gedrückt halten zum bearbeiten)";
+    }
+}
+
+@media (pointer:fine) {
+    #list-name:empty:not(:focus):before {
+        content: "Leer (Rechtsklick zum bearbeiten)";
+    }
 }
 
 #searchbar {
