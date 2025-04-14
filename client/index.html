@@ -26,6 +26,21 @@
             </div>
         </div>
 
+        <dialog id="list-dialog">
+            <form method="dialog">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <div style="display: grid; grid-template-columns: auto auto; gap: 5px;">
+                        <label for="input-name">Name</label>
+                        <input type="text" id="input-name" />
+                    </div>
+                    <div>
+                        <button type="submit">Ok</button>
+                        <button type="button" class="button-cancel">Abbrechen</button>
+                    </div>
+                </div>
+            </form>
+        </dialog>
+
         <template id="template-todo-item">
             <link rel="stylesheet" href="/client/todo-item.css" />
             <div id="root-element">
@@ -49,8 +64,8 @@
                     </div>
                     <div>
                         <button type="submit">Ok</button>
-                        <button type="button" id="button-delete">Löschen</button>
-                        <button type="button" id="button-cancel">Abbrechen</button>
+                        <button type="button" class="button-delete">Löschen</button>
+                        <button type="button" class="button-cancel">Abbrechen</button>
                     </div>
                 </div>
             </form>

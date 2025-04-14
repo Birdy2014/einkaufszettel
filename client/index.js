@@ -4,8 +4,8 @@ class TodoItemDialog {
     constructor() {
         this.element = document.getElementById("todo-item-dialog")
         this.form = document.querySelector("#todo-item-dialog > form")
-        this.button_cancel = document.getElementById("button-cancel")
-        this.button_delete = document.getElementById("button-delete")
+        this.button_cancel = this.element.querySelector(".button-cancel")
+        this.button_delete = this.element.querySelector(".button-delete")
 
         this.form.addEventListener("submit", _ => {
             for (const attribute_name of this.editable_attributes) {
@@ -44,6 +44,49 @@ class TodoItemDialog {
 }
 
 const todo_item_dialog = new TodoItemDialog()
+
+class ListDialog {
+    constructor() {
+        this.element = document.getElementById("list-dialog")
+        this.form = document.querySelector("#list-dialog > form")
+        this.button_cancel = this.element.querySelector(".button-cancel")
+
+        this.form.addEventListener("submit", _ => {
+            const input_element = this.element.querySelector(`#input-name`)
+            this.#send_update_request(input_element.value)
+        })
+
+        this.button_cancel.addEventListener("click", _ => {
+            this.element.close()
+        })
+    }
+
+    open() {
+        const element = this.element.querySelector(`#input-name`)
+        element.value = shopping_list.name
+
+        this.element.showModal()
+    }
+
+    async #send_update_request(name) {
+        await fetch(
+            "/api/list",
+            {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", },
+                cache: "no-cache",
+                body: JSON.stringify({
+                    id: shopping_list_id,
+                    name,
+                }),
+            }
+        )
+
+        setTimeout(_ => refresh_list_display(), 0)
+    }
+}
+
+const list_dialog = new ListDialog()
 
 class TodoItem extends HTMLElement {
     static observedAttributes = [ "singular", "plural", "amount", "category", "done" ]
@@ -319,13 +362,18 @@ async function init_list() {
         refresh_list_display()
     })
 
+    document.getElementById("list-name").addEventListener("contextmenu", event => {
+        event.preventDefault()
+        list_dialog.open()
+    })
+
     while (true) {
         await reload_list_from_server()
         await new Promise(resolve => setTimeout(resolve, 10))
     }
 }
 
-// TODO: Allow creation and renaming of lists
+// TODO: Allow creation and deletion of lists
 
 async function init() {
     const params = new URLSearchParams(location.search)

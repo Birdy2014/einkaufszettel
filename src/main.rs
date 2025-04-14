@@ -86,6 +86,34 @@ async fn get_api_lists(State(state): State<Arc<AppState>>) -> Json<Vec<String>> 
 }
 
 #[derive(Deserialize)]
+struct RequestBodyPutApiList {
+    id: usize,
+    name: String,
+}
+
+async fn put_api_list(
+    State(state): State<Arc<AppState>>,
+    extract::Json(payload): extract::Json<RequestBodyPutApiList>,
+) -> StatusCode {
+    let mut data = state.data.write().unwrap();
+
+    if payload.id >= data.shopping_lists.len() {
+        return StatusCode::BAD_REQUEST;
+    }
+
+    data.shopping_lists[payload.id].name = payload.name;
+
+    handle_data_change(
+        state.save_path.as_str(),
+        &state.change_block_channel_sender,
+        &mut data,
+        payload.id,
+    );
+
+    StatusCode::OK
+}
+
+#[derive(Deserialize)]
 struct RequestQueryGetList {
     id: usize,
     generation: i32,
@@ -252,6 +280,7 @@ async fn main() {
         .route("/", get(get_root))
         .route("/client/:filename", get(get_static))
         .route("/api/lists", get(get_api_lists))
+        .route("/api/list", put(put_api_list))
         .route("/api/list", post(post_api_list))
         .route("/api/item", post(post_api_item))
         .route("/api/item", put(put_api_item))
