@@ -33,28 +33,29 @@
                 <div id="display-amount"></div>
                 <div id="display-name"></div>
             </div>
-            <dialog id="dialog">
-                <form method="dialog">
-                    <div style="display: flex; flex-direction: column; gap: 5px;">
-                        <div style="display: grid; grid-template-columns: auto auto; gap: 5px;">
-                            <label for="input-singular">Singular</label>
-                            <input type="text" id="input-singular" />
-                            <label for="input-plural">Plural</label>
-                            <input type="text" id="input-plural" />
-                            <label for="input-amount">Anzahl</label>
-                            <input type="number" id="input-amount" />
-                            <label for="input-category">Kategorie</label>
-                            <input type="text" id="input-category" />
-                        </div>
-                        <div>
-                            <button type="submit">Ok</button>
-                            <button type="button" id="button-delete">Löschen</button>
-                            <button type="button" id="button-cancel">Abbrechen</button>
-                        </div>
-                    </div>
-                </form>
-            </dialog>
         </template>
+
+        <dialog id="todo-item-dialog">
+            <form method="dialog">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <div style="display: grid; grid-template-columns: auto auto; gap: 5px;">
+                        <label for="input-singular">Singular</label>
+                        <input type="text" id="input-singular" />
+                        <label for="input-plural">Plural</label>
+                        <input type="text" id="input-plural" />
+                        <label for="input-amount">Anzahl</label>
+                        <input type="number" id="input-amount" />
+                        <label for="input-category">Kategorie</label>
+                        <input type="text" id="input-category" />
+                    </div>
+                    <div>
+                        <button type="submit">Ok</button>
+                        <button type="button" id="button-delete">Löschen</button>
+                        <button type="button" id="button-cancel">Abbrechen</button>
+                    </div>
+                </div>
+            </form>
+        </dialog>
 
         <template id="template-todo-item-group">
             <slot name="name" style="font-weight: bold;">NAME PLACEHOLDER</slot>

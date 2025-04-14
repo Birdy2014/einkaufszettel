@@ -1,7 +1,52 @@
+class TodoItemDialog {
+    editable_attributes = [ "singular", "plural", "amount", "category" ]
+
+    constructor() {
+        this.element = document.getElementById("todo-item-dialog")
+        this.form = document.querySelector("#todo-item-dialog > form")
+        this.button_cancel = document.getElementById("button-cancel")
+        this.button_delete = document.getElementById("button-delete")
+
+        this.form.addEventListener("submit", _ => {
+            for (const attribute_name of this.editable_attributes) {
+                const element = this.element.querySelector(`#input-${attribute_name}`)
+                this.todo_item.setAttribute(attribute_name, element.value.trim())
+            }
+
+            this.todo_item.send_update_request()
+        })
+
+        this.button_cancel.addEventListener("click", _ => {
+            this.element.close()
+        })
+
+        this.button_delete.addEventListener("click", _ => {
+            this.todo_item.setAttribute("deleted", "")
+            this.element.close()
+
+            this.todo_item.send_update_request()
+        })
+    }
+
+    open(id) {
+        this.todo_item = document.getElementById(id)
+        if (!this.todo_item) {
+            console.error(`No element with id ${id}`)
+            return;
+        }
+        for (const attribute_name of this.editable_attributes) {
+            const element = this.element.querySelector(`#input-${attribute_name}`)
+            element.value = this.todo_item.getAttribute(attribute_name)
+        }
+
+        this.element.showModal()
+    }
+}
+
+const todo_item_dialog = new TodoItemDialog()
+
 class TodoItem extends HTMLElement {
     static observedAttributes = [ "singular", "plural", "amount", "category", "done" ]
-
-    editable_attributes = [ "singular", "plural", "amount", "category" ]
 
     constructor() {
         super()
@@ -11,10 +56,6 @@ class TodoItem extends HTMLElement {
         this.root.appendChild(template.content.cloneNode(true))
 
         this.root_element = this.root.getElementById("root-element")
-        this.dialog = this.root.getElementById("dialog")
-        this.form = this.root.querySelector("#dialog > form")
-        this.button_cancel = this.root.getElementById("button-cancel")
-        this.button_delete = this.root.getElementById("button-delete")
 
         this.display_name = this.root.getElementById("display-name")
         this.display_amount = this.root.getElementById("display-amount")
@@ -27,33 +68,21 @@ class TodoItem extends HTMLElement {
 
         this.root_element.addEventListener("contextmenu", event => {
             event.preventDefault()
-
-            for (const attribute_name of this.editable_attributes) {
-                const element = this.root.getElementById(`input-${attribute_name}`)
-                element.value = this.getAttribute(attribute_name)
+            const id = this.get_id()
+            if (id === undefined) {
+                return
             }
-
-            this.dialog.showModal()
+            todo_item_dialog.open(id)
         })
+    }
 
-        this.form.addEventListener("submit", _ => {
-            for (const attribute_name of this.editable_attributes) {
-                const element = this.root.getElementById(`input-${attribute_name}`)
-                this.setAttribute(attribute_name, element.value.trim())
-            }
-
-            this.send_update_request()
-        })
-
-        this.button_cancel.addEventListener("click", _ => {
-            this.dialog.close()
-        })
-
-        this.button_delete.addEventListener("click", _ => {
-            this.setAttribute("deleted", "")
-
-            this.send_update_request()
-        })
+    get_id() {
+        const item_id = parseInt(this.getAttribute("id"))
+        if (isNaN(item_id)) {
+            console.error(`Invalid item_id: ${this.getAttribute("id")}`)
+            return
+        }
+        return item_id
     }
 
     async send_update_request() {
@@ -61,9 +90,8 @@ class TodoItem extends HTMLElement {
             return
         }
 
-        const item_id = parseInt(this.getAttribute("id"))
-        if (isNaN(item_id)) {
-            console.error(`Invalid item_id: ${this.getAttribute("id")}`)
+        const item_id = this.get_id()
+        if (item_id === undefined) {
             return
         }
 
@@ -148,10 +176,6 @@ let shopping_list = { generation: -1, name: "", items: [], }
 let shopping_list_id = -1
 
 function refresh_list_display() {
-    // When a dialog element with an open modal is removed from the dom, the modal is closed.
-    // To prevent this from happening when another user edits the list, create new elements for the lists
-    // and reuse as many elements as possible.
-
     document.getElementById("list-name").innerText = shopping_list.name
 
     const search_string = document.getElementById("searchbar").value
