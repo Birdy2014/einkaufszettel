@@ -50,25 +50,35 @@ class ListDialog {
         this.element = document.getElementById("list-dialog")
         this.form = document.querySelector("#list-dialog > form")
         this.button_cancel = this.element.querySelector(".button-cancel")
+        this.button_delete = this.element.querySelector(".button-delete")
+        this.input_element = this.element.querySelector("#input-list-name")
 
         this.form.addEventListener("submit", _ => {
-            const input_element = this.element.querySelector(`#input-list-name`)
-            this.#send_update_request(input_element.value)
+            this.#send_update_request(false)
         })
 
         this.button_cancel.addEventListener("click", _ => {
             this.element.close()
         })
+
+        this.button_delete.addEventListener("click", _ => {
+            if (!confirm(`Einkaufszettel '${shopping_list.name}' wirklich löschen?`)) {
+                return
+            }
+
+            this.#send_update_request(true).then(_ => window.location = "/")
+        })
     }
 
     open() {
-        const element = this.element.querySelector(`#input-list-name`)
-        element.value = shopping_list.name
+        this.input_element.value = shopping_list.name
 
         this.element.showModal()
     }
 
-    async #send_update_request(name) {
+    async #send_update_request(deleted) {
+        const name = this.input_element.value
+
         await fetch(
             "/api/list",
             {
@@ -78,6 +88,7 @@ class ListDialog {
                 body: JSON.stringify({
                     id: shopping_list_id,
                     name,
+                    deleted,
                 }),
             }
         )
@@ -261,7 +272,7 @@ button_add.addEventListener("click", async _ => {
     )
 })
 
-let shopping_list = { generation: -1, name: "", items: [], }
+let shopping_list = { generation: -1, name: "", items: [], deleted: false }
 let shopping_list_id = -1
 
 function refresh_list_display() {
@@ -438,10 +449,10 @@ async function init() {
     const response = await fetch("/api/lists")
     const lists = await response.json()
 
-    list_selector.replaceChildren(...lists.entries().map(([id, name]) => {
+    list_selector.replaceChildren(...lists.entries().filter(([_id, list]) => !list.deleted).map(([id, list]) => {
         const element = document.createElement("a")
         element.href = `/?list_id=${id}`
-        element.innerText = name
+        element.innerText = list.name
         element.classList = "list-select-item"
         return element
     }))

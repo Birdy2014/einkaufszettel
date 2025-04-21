@@ -26,6 +26,7 @@ struct ShoppingList {
     generation: i32,
     name: String,
     items: Vec<ShoppingListItem>,
+    deleted: bool,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -74,13 +75,22 @@ async fn get_static(extract::Path(filename): extract::Path<String>) -> impl Into
     )
 }
 
-async fn get_api_lists(State(state): State<Arc<AppState>>) -> Json<Vec<String>> {
+#[derive(Serialize)]
+struct ResponseBodyGetApiLists {
+    name: String,
+    deleted: bool,
+}
+
+async fn get_api_lists(State(state): State<Arc<AppState>>) -> Json<Vec<ResponseBodyGetApiLists>> {
     let data = state.data.read().unwrap();
 
     Json(
         data.shopping_lists
             .iter()
-            .map(|list| list.name.to_string())
+            .map(|list| ResponseBodyGetApiLists {
+                name: list.name.to_string(),
+                deleted: list.deleted,
+            })
             .collect(),
     )
 }
@@ -89,6 +99,7 @@ async fn get_api_lists(State(state): State<Arc<AppState>>) -> Json<Vec<String>> 
 struct RequestBodyPutApiList {
     id: usize,
     name: String,
+    deleted: bool,
 }
 
 async fn put_api_list(
@@ -101,7 +112,9 @@ async fn put_api_list(
         return StatusCode::BAD_REQUEST;
     }
 
-    data.shopping_lists[payload.id].name = payload.name;
+    let list = &mut data.shopping_lists[payload.id];
+    list.name = payload.name;
+    list.deleted = payload.deleted;
 
     handle_data_change(
         state.save_path.as_str(),
@@ -299,6 +312,7 @@ async fn main() {
                 generation: 0,
                 name: "Default - TODO".to_string(),
                 items: vec![],
+                deleted: false,
             }],
         },
     };
