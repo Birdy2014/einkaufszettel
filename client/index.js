@@ -461,6 +461,10 @@ async function init() {
 
     const button_add_list = document.getElementById("button-add-list")
     button_add_list.addEventListener("click", _ => {
+        if (!confirm("Neue Liste hinzufügen?")) {
+            return;
+        }
+
         fetch(
             "/api/lists",
             {
