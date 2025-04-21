@@ -335,7 +335,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(get_root))
-        .route("/client/:filename", get(get_static))
+        .route("/client/{filename}", get(get_static))
         .route("/api/lists", get(get_api_lists))
         .route("/api/lists", post(post_api_lists))
         .route("/api/list", put(put_api_list))
