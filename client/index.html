@@ -30,8 +30,8 @@
             <form method="dialog">
                 <div style="display: flex; flex-direction: column; gap: 5px;">
                     <div style="display: grid; grid-template-columns: auto auto; gap: 5px;">
-                        <label for="input-name">Name</label>
-                        <input type="text" id="input-name" />
+                        <label for="input-list-name">Name</label>
+                        <input type="text" id="input-list-name" />
                     </div>
                     <div>
                         <button type="submit">Ok</button>
@@ -75,5 +75,20 @@
             <slot name="name" style="font-weight: bold;">NAME PLACEHOLDER</slot>
             <slot name="content">CONTENT PLACEHOLDER</div>
         </template>
+
+        <dialog id="todo-item-group-dialog">
+            <form method="dialog">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <div style="display: grid; grid-template-columns: auto auto; gap: 5px;">
+                        <label for="input-group-name">Name</label>
+                        <input type="text" id="input-group-name" />
+                    </div>
+                    <div>
+                        <button type="submit">Ok</button>
+                        <button type="button" class="button-cancel">Abbrechen</button>
+                    </div>
+                </div>
+            </form>
+        </dialog>
     </body>
 </html>

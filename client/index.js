@@ -52,7 +52,7 @@ class ListDialog {
         this.button_cancel = this.element.querySelector(".button-cancel")
 
         this.form.addEventListener("submit", _ => {
-            const input_element = this.element.querySelector(`#input-name`)
+            const input_element = this.element.querySelector(`#input-list-name`)
             this.#send_update_request(input_element.value)
         })
 
@@ -62,7 +62,7 @@ class ListDialog {
     }
 
     open() {
-        const element = this.element.querySelector(`#input-name`)
+        const element = this.element.querySelector(`#input-list-name`)
         element.value = shopping_list.name
 
         this.element.showModal()
@@ -87,6 +87,52 @@ class ListDialog {
 }
 
 const list_dialog = new ListDialog()
+
+class TodoItemGroupDialog {
+    constructor() {
+        this.element = document.getElementById("todo-item-group-dialog")
+        this.form = document.querySelector("#todo-item-group-dialog > form")
+        this.button_cancel = this.element.querySelector(".button-cancel")
+        this.input_element = this.element.querySelector("#input-group-name")
+
+        this.form.addEventListener("submit", _ => {
+            this.#send_update_request(this.input_element.value)
+        })
+
+        this.button_cancel.addEventListener("click", _ => {
+            this.element.close()
+        })
+    }
+
+    open(name) {
+        this.old_name = name
+        this.input_element.value = name
+
+        this.element.showModal()
+    }
+
+    async #send_update_request() {
+        const new_name = this.input_element.value
+
+        await fetch(
+            "/api/category",
+            {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", },
+                cache: "no-cache",
+                body: JSON.stringify({
+                    shopping_list_id,
+                    old_name: this.old_name,
+                    new_name,
+                }),
+            }
+        )
+
+        setTimeout(_ => refresh_list_display(), 0)
+    }
+}
+
+const todo_item_group_dialog = new TodoItemGroupDialog()
 
 class TodoItem extends HTMLElement {
     static observedAttributes = [ "singular", "plural", "amount", "category", "done" ]
@@ -269,6 +315,10 @@ function refresh_list_display() {
 
             slot_name.setAttribute("slot", "name")
             slot_name.innerText = category || "Ohne Kategorie"
+            slot_name.addEventListener("contextmenu", event => {
+                event.preventDefault()
+                todo_item_group_dialog.open(category)
+            })
 
             slot_content.setAttribute("slot", "content")
             return { category, done, slot_content }

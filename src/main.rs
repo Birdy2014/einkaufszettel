@@ -235,6 +235,41 @@ async fn put_api_item(
     StatusCode::OK
 }
 
+#[derive(Deserialize)]
+struct RequestBodyPutApiCategory {
+    shopping_list_id: usize,
+    old_name: String,
+    new_name: String,
+}
+
+async fn put_api_category(
+    State(state): State<Arc<AppState>>,
+    extract::Json(payload): extract::Json<RequestBodyPutApiCategory>,
+) -> StatusCode {
+    let mut data = state.data.write().unwrap();
+
+    if payload.shopping_list_id >= data.shopping_lists.len() {
+        return StatusCode::BAD_REQUEST;
+    }
+
+    data.shopping_lists[payload.shopping_list_id]
+        .items
+        .iter_mut()
+        .filter(|item| item.category == payload.old_name)
+        .for_each(|item| {
+            item.category = payload.new_name.clone();
+        });
+
+    handle_data_change(
+        state.save_path.as_str(),
+        &state.change_block_channel_sender,
+        &mut data,
+        payload.shopping_list_id,
+    );
+
+    StatusCode::OK
+}
+
 fn handle_data_change(
     save_path: &str,
     sender: &broadcast::Sender<()>,
@@ -284,6 +319,7 @@ async fn main() {
         .route("/api/list", post(post_api_list))
         .route("/api/item", post(post_api_item))
         .route("/api/item", put(put_api_item))
+        .route("/api/category", put(put_api_category))
         .with_state(shared_state);
 
     println!("Listening on {}", address);
