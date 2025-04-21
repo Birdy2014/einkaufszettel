@@ -95,6 +95,19 @@ async fn get_api_lists(State(state): State<Arc<AppState>>) -> Json<Vec<ResponseB
     )
 }
 
+async fn post_api_lists(State(state): State<Arc<AppState>>) -> StatusCode {
+    let mut data = state.data.write().unwrap();
+
+    data.shopping_lists.push(ShoppingList {
+        generation: 0,
+        name: "".to_string(),
+        items: vec![],
+        deleted: false,
+    });
+
+    StatusCode::OK
+}
+
 #[derive(Deserialize)]
 struct RequestBodyPutApiList {
     id: usize,
@@ -308,12 +321,7 @@ async fn main() {
     let data = match fs::read_to_string(path.as_str()) {
         Ok(file) => serde_json::from_str(file.as_str()).unwrap(),
         Err(_) => Data {
-            shopping_lists: vec![ShoppingList {
-                generation: 0,
-                name: "Default - TODO".to_string(),
-                items: vec![],
-                deleted: false,
-            }],
+            shopping_lists: vec![],
         },
     };
 
@@ -329,6 +337,7 @@ async fn main() {
         .route("/", get(get_root))
         .route("/client/:filename", get(get_static))
         .route("/api/lists", get(get_api_lists))
+        .route("/api/lists", post(post_api_lists))
         .route("/api/list", put(put_api_list))
         .route("/api/list", post(post_api_list))
         .route("/api/item", post(post_api_item))

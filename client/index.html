@@ -11,7 +11,11 @@
     <body>
         <div id="server-error-message" style="display: none;"><div>Verbindung fehlgeschlagen</div></div>
         <div id="center">
-            <div id="list_selector">
+            <div id="list-selector-container">
+                <div id="list-selector-list"></div>
+                <div style="display: flex; flex-direction: row-reverse;">
+                    <a href="javascript:void(0)" id="button-add-list">Hinzufügen</a>
+                </div>
             </div>
 
             <div id="list_container">
@@ -19,7 +23,7 @@
                 <input type="text" id="searchbar" placeholder="Suchen" autocomplete="off" />
                 <div class="list" id="list_todo"></div>
                 <div style="display: flex; flex-direction: row-reverse;">
-                    <a href="javascript:void(0)" id="button_add">Hinzufügen</a>
+                    <a href="javascript:void(0)" id="button-add-item">Hinzufügen</a>
                 </div>
                 <div class="horizontal-separator"></div>
                 <div class="list" id="list_done"></div>

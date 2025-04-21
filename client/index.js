@@ -258,7 +258,7 @@ class TodoItemGroup extends HTMLElement {
     }
 }
 
-button_add.addEventListener("click", async _ => {
+document.getElementById("button-add-item").addEventListener("click", async _ => {
     await fetch(
         "/api/item",
         {
@@ -410,8 +410,10 @@ async function reload_list_from_server() {
     refresh_list_display()
 }
 
+const list_selector_container = document.getElementById("list-selector-container")
+
 async function init_list() {
-    list_selector.style.display = "none"
+    list_selector_container.style.display = "none"
     list_container.style.removeProperty("display")
 
     customElements.define("todo-item", TodoItem)
@@ -434,8 +436,6 @@ async function init_list() {
     }
 }
 
-// TODO: Allow creation and deletion of lists
-
 async function init() {
     const params = new URLSearchParams(location.search)
     const list_id = parseInt(params.get("list_id"))
@@ -449,7 +449,9 @@ async function init() {
     const response = await fetch("/api/lists")
     const lists = await response.json()
 
-    list_selector.replaceChildren(...lists.entries().filter(([_id, list]) => !list.deleted).map(([id, list]) => {
+    const list_selector_list = document.getElementById("list-selector-list")
+
+    list_selector_list.replaceChildren(...lists.entries().filter(([_id, list]) => !list.deleted).map(([id, list]) => {
         const element = document.createElement("a")
         element.href = `/?list_id=${id}`
         element.innerText = list.name
@@ -457,7 +459,19 @@ async function init() {
         return element
     }))
 
-    list_selector.style.removeProperty("display")
+    const button_add_list = document.getElementById("button-add-list")
+    button_add_list.addEventListener("click", _ => {
+        fetch(
+            "/api/lists",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json", },
+                cache: "no-cache",
+            }
+        ).then(_ => location.reload())
+    })
+
+    list_selector_container.style.removeProperty("display")
     list_container.style.display = "none"
 }
 
