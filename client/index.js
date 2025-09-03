@@ -363,16 +363,18 @@ function refresh_list_display() {
 
 const long_polling_timeout = 10000
 const error_wait_time = 4000
+let connection_established = false;
 
 async function reload_list_from_server() {
     const error_message_element = document.getElementById("server-error-message")
-    const error_message_timeout = setTimeout(_ => error_message_element.style.display = "none", 500)
 
     const start_time = Date.now()
 
     let response
     try {
-        response = await fetch(`/api/list?id=${shopping_list_id}&generation=${shopping_list.generation}`, {
+        // require response after loosing connection to make sure the server is reachable again
+        const generation = connection_established ? shopping_list.generation : 0;
+        response = await fetch(`/api/list?id=${shopping_list_id}&generation=${generation}`, {
             method: "POST",
             signal: AbortSignal.timeout(long_polling_timeout),
             cache: "no-cache",
@@ -382,15 +384,17 @@ async function reload_list_from_server() {
 
         if (error instanceof DOMException && error.name == "TimeoutError") {
             if (time_to_fail > long_polling_timeout / 2) {
+                // Ok
                 return
             }
 
             console.log(`long polling failed with timeout after ${time_to_fail}ms`)
         }
 
+        // lost connection
         console.log(error)
-        clearTimeout(error_message_timeout)
         error_message_element.style.removeProperty("display")
+        connection_established = false
 
         await new Promise(resolve => setTimeout(resolve, error_wait_time))
         return
@@ -398,14 +402,16 @@ async function reload_list_from_server() {
 
     if (!response.ok) {
         console.log("not ok")
-        clearTimeout(error_message_timeout)
         error_message_element.style.removeProperty("display")
+        connection_established = false
 
         await new Promise(resolve => setTimeout(resolve, error_wait_time))
         return
     }
 
     shopping_list = await response.json()
+    error_message_element.style.display = "none"
+    connection_established = true
 
     refresh_list_display()
 }
