@@ -1,5 +1,5 @@
 class TodoItemDialog {
-    editable_attributes = [ "singular", "plural", "amount", "category" ]
+    editable_attributes = [ "singular", "plural", "amount", "category", "note" ]
 
     constructor() {
         this.element = document.getElementById("todo-item-dialog")
@@ -146,7 +146,7 @@ class TodoItemGroupDialog {
 const todo_item_group_dialog = new TodoItemGroupDialog()
 
 class TodoItem extends HTMLElement {
-    static observedAttributes = [ "singular", "plural", "amount", "category", "done" ]
+    static observedAttributes = [ "singular", "plural", "amount", "category", "note", "done" ]
 
     constructor() {
         super()
@@ -159,6 +159,7 @@ class TodoItem extends HTMLElement {
 
         this.display_name = this.root.getElementById("display-name")
         this.display_amount = this.root.getElementById("display-amount")
+        this.display_note = this.root.getElementById("display-note")
 
         this.root_element.addEventListener("click", _ => {
             this.toggleAttribute("done")
@@ -209,6 +210,7 @@ class TodoItem extends HTMLElement {
                         plural: this.getAttribute("plural"),
                         category: this.getAttribute("category"),
                         amount: parseInt(this.getAttribute("amount")) || 0,
+                        note: this.getAttribute("note"),
                         done: this.getAttribute("done") !== null,
                         deleted: this.getAttribute("deleted") !== null,
                     },
@@ -233,6 +235,8 @@ class TodoItem extends HTMLElement {
         } else {
             this.display_amount.innerText = amount.toString()
         }
+
+        this.display_note.innerText = this.getAttribute("note")
     }
 
     attributeChangedCallback(name, _, new_value) {
@@ -346,6 +350,7 @@ function refresh_list_display() {
         new_todo.setAttribute("plural", item.plural)
         new_todo.setAttribute("amount", item.amount)
         new_todo.setAttribute("category", item.category)
+        new_todo.setAttribute("note", item.note)
 
         if (item.done) {
             new_todo.setAttribute("done", "")
